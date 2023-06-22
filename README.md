@@ -41,7 +41,7 @@ python3 main.py
 
 ## Credits
 
-- [Dev-v2](https://github.com/New-Dev3)
+- [Alone Dev](https://github.com/New-Dev3)
 - [Pyrogram](https://github.com/pyrogram/pyrogram)
 - [Movie Info API](https://api.sumanjay.cf/watch/)
 - [MovieINFOBot-v3](https://github.com/Team-MasterXBots/MovieINFOBot-v3)

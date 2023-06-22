@@ -12,8 +12,7 @@ API = "https://api.sumanjay.cf/watch/query="
 
 JOIN_BUTTONS = [
     InlineKeyboardButton(
-        text='⚙ Join Updates Channel ⚙',
-        url='https://telegram.me/FayasNoushad'
+        text="⚙ Join Updates Channel ⚙", url="https://telegram.me/FayasNoushad"
     )
 ]
 
@@ -24,15 +23,14 @@ async def get_command(bot, update):
     username = (await bot.get_me()).username
     keyboard = [
         InlineKeyboardButton(
-            text="Click here",
-            url=f"https://telegram.me/{username}?start={movie}"
+            text="Click here", url=f"https://telegram.me/{username}?start={movie}"
         )
     ]
     await update.reply_text(
         text=f"**Click the button below**",
         reply_markup=InlineKeyboardMarkup([keyboard]),
         disable_web_page_preview=True,
-        quote=True
+        quote=True,
     )
 
 
@@ -64,12 +62,7 @@ async def get_movie(bot, update, name, cb=False):
         number += 1
         try:
             movie_text = "movie|" + name + "|" + str(number)
-            button = [
-                InlineKeyboardButton(
-                    text=description,
-                    callback_data=movie_text
-                )
-            ]
+            button = [InlineKeyboardButton(text=description, callback_data=movie_text)]
             keyboard.append(button)
         except:
             pass
@@ -79,62 +72,60 @@ async def get_movie(bot, update, name, cb=False):
             text=text,
             reply_markup=reply_markup,
             disable_web_page_preview=True,
-            quote=True
+            quote=True,
         )
         await update.message.delete()
     elif cb:
         await update.message.edit_text(
-            text=text,
-            reply_markup=reply_markup,
-            disable_web_page_preview=True
+            text=text, reply_markup=reply_markup, disable_web_page_preview=True
         )
     else:
         await update.reply_text(
             text=text,
             reply_markup=reply_markup,
             disable_web_page_preview=True,
-            quote=True
+            quote=True,
         )
 
 
 async def movie_info(movie, user_id):
     try:
-        if movie['movie_thumb'] and await db.allow_info(user_id, "photo"):
-            photo = movie['movie_thumb']
+        if movie["movie_thumb"] and await db.allow_info(user_id, "photo"):
+            photo = movie["movie_thumb"]
         else:
             photo = None
     except:
         photo = None
     description_set = []
-    if movie['title']:
-        description_set.append(movie['title'])
-    if movie['type']:
-        description_set.append(movie['type'].capitalize())
-    if movie['release_year']:
-        description_set.append(str(movie['release_year']))
+    if movie["title"]:
+        description_set.append(movie["title"])
+    if movie["type"]:
+        description_set.append(movie["type"].capitalize())
+    if movie["release_year"]:
+        description_set.append(str(movie["release_year"]))
     description = " | ".join(description_set)
     try:
         info = f"**Title:** `{movie['title']}`\n"
     except:
-        info = None 
+        info = None
     try:
-        if movie['type'] and await db.allow_info(user_id, "type"):
+        if movie["type"] and await db.allow_info(user_id, "type"):
             info += f"**Type:** `{movie['type'].capitalize()}`\n"
     except:
         pass
     try:
-        if movie['release_date'] and await db.allow_info(user_id, "release_date"):
+        if movie["release_date"] and await db.allow_info(user_id, "release_date"):
             info += f"**Release Date:** `{str(movie['release_date'])}`\n"
     except:
         pass
     try:
-        if movie['release_year'] and await db.allow_info(user_id, "release_year"):
+        if movie["release_year"] and await db.allow_info(user_id, "release_year"):
             info += f"**Release Year:** `{movie['release_year']}`\n"
     except:
         pass
     try:
-        if movie['score'] and await db.allow_info(user_id, "score"):
-            scores = movie['score']
+        if movie["score"] and await db.allow_info(user_id, "score"):
+            scores = movie["score"]
             info += "**Score:** "
             score_set = []
             for score in scores:
@@ -143,12 +134,14 @@ async def movie_info(movie, user_id):
     except:
         pass
     try:
-        if movie['providers'] and await db.allow_info(user_id, "providers"):
+        if movie["providers"] and await db.allow_info(user_id, "providers"):
             info += "**Providers:** "
-            providers = movie['providers']
+            providers = movie["providers"]
             provider_set = []
             for provider in providers:
-                provider_set.append(f"<a href={providers[provider]}>{provider.capitalize()}</a>")
+                provider_set.append(
+                    f"<a href={providers[provider]}>{provider.capitalize()}</a>"
+                )
             info += " | ".join(provider_set)
     except:
         pass
@@ -161,7 +154,7 @@ async def inline_info(bot, update):
         await update.answer(
             results=[],
             switch_pm_text="First start the bot",
-            switch_pm_parameter="start"
+            switch_pm_parameter="start",
         )
         return
     query = update.query
@@ -181,14 +174,15 @@ async def inline_info(bot, update):
             try:
                 answers.append(
                     InlineQueryResultArticle(
-                        title=movie['title'],
-                        thumb_url=movie['movie_thumb'] if movie['movie_thumb'] else None,
+                        title=movie["title"],
+                        thumb_url=movie["movie_thumb"]
+                        if movie["movie_thumb"]
+                        else None,
                         description=description,
                         input_message_content=InputTextMessageContent(
-                            message_text=info,
-                            disable_web_page_preview=True
+                            message_text=info, disable_web_page_preview=True
                         ),
-                        reply_markup=reply_markup
+                        reply_markup=reply_markup,
                     )
                 )
             except Exception as error:
@@ -197,11 +191,11 @@ async def inline_info(bot, update):
             try:
                 answers.append(
                     InlineQueryResultPhoto(
-                        title=movie['title'],
+                        title=movie["title"],
                         photo_url=photo,
                         description=description,
                         caption=info,
-                        reply_markup=reply_markup
+                        reply_markup=reply_markup,
                     )
                 )
             except Exception as error:
@@ -221,30 +215,28 @@ async def send_movie_info(bot, update):
     elif update.data.startswith("movie|"):
         callback, name, value = update.data.split("|")
         movie = get_movies(name)[int(value) - 1]
-        photo, description, information = await movie_info(movie=movie, user_id=update.from_user.id)
+        photo, description, information = await movie_info(
+            movie=movie, user_id=update.from_user.id
+        )
         callback_buttons = [
             InlineKeyboardButton(text="🔙 Back", callback_data=f"back|{name}"),
             InlineKeyboardButton(text="🔄 Refresh", callback_data=update.data),
-            InlineKeyboardButton(text="Close ⛔️", callback_data="close")
+            InlineKeyboardButton(text="Close ⛔️", callback_data="close"),
         ]
         if photo:
             if update.message.reply_to_message:
                 await update.message.reply_to_message.reply_photo(
                     photo=photo,
                     caption=information,
-                    reply_markup=InlineKeyboardMarkup(
-                        [callback_buttons, JOIN_BUTTONS]
-                    ),
-                    quote=True
+                    reply_markup=InlineKeyboardMarkup([callback_buttons, JOIN_BUTTONS]),
+                    quote=True,
                 )
             else:
                 await update.message.reply_photo(
                     photo=photo,
                     caption=information,
-                    reply_markup=InlineKeyboardMarkup(
-                        [callback_buttons, JOIN_BUTTONS]
-                    ),
-                    quote=True
+                    reply_markup=InlineKeyboardMarkup([callback_buttons, JOIN_BUTTONS]),
+                    quote=True,
                 )
             await update.message.delete()
         else:
@@ -252,17 +244,13 @@ async def send_movie_info(bot, update):
                 await update.message.reply_to_message.reply_text(
                     text=information,
                     disable_web_page_preview=True,
-                    reply_markup=InlineKeyboardMarkup(
-                        [callback_buttons, JOIN_BUTTONS]
-                    ),
-                    quote=True
+                    reply_markup=InlineKeyboardMarkup([callback_buttons, JOIN_BUTTONS]),
+                    quote=True,
                 )
                 await update.message.delete()
             else:
                 await update.message.edit_text(
                     text=information,
                     disable_web_page_preview=True,
-                    reply_markup=InlineKeyboardMarkup(
-                        [callback_buttons, JOIN_BUTTONS]
-                    )
+                    reply_markup=InlineKeyboardMarkup([callback_buttons, JOIN_BUTTONS]),
                 )
